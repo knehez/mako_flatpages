@@ -1,16 +1,35 @@
+In your Django application directory launch: 
 
-copy folder
+```sh
+git clone https://github.com/knehez/mako_flatpages.git
+```
 
-### settings.py
+### Configure settings.py
 
-INSTALLED_APPS add 'django.contrib.sites',
+Add two modules required:
+
+```python
+INSTALLED_APPS = (
+	...,
+	'django.contrib.sites',
+	'mako_flatpages',
+)
+# add SITE_ID = 1 as well
 SITE_ID = 1
+```
 
-INSTALLED_APPS add 'mako_flatpages',
-MIDDLEWARE_CLASSES add 'mako_flatpages.middleware.FlatpageFallbackMiddleware',
+Among MIDDLEWARE_CLASSES add 'mako_flatpages.middleware.FlatpageFallbackMiddleware',
 
+```python
+MIDDLEWARE_CLASSES = (
+	...,
+	'mako_flatpages.middleware.FlatpageFallbackMiddleware',
+)
+# if not exists add the following:
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+```
 
+Launch manage.py tasks:
 
 ```sh
 python manage.py syncdb
@@ -20,13 +39,15 @@ python manage.py syncdb
 python manage.py migrate
 ```
 
-create templates/flatpages/default.html.mako
+create file:
+### templates/flatpages/default.html.mako
+```html
+# my mako template in a flat page:
+${flatpage.content}
+```
 
-
-## django use mako
-
-
-### views.py
+In you view.py wher you would like to use this make_flatpages use the following:
+### views.py example
 
 ```python
 from mako.template import Template
@@ -38,39 +59,15 @@ from django.http import HttpResponse
 def home(request):
 	...
 	lookup = TemplateLookup(directories=[settings.TEMPLATES_DIR])
-
+    
+    # reference for your template
 	t = lookup.get_template("flatpages/def_site.html.mako")
 	
+	# apply template
 	rendered = t.render(content="apple")
+	
 	return HttpResponse(rendered)
 ...
 ```
 	
-	
-	
-### templates/flatpages/default.html.mako
-```html
-<%inherit file="../1.mako"/>
-
-${flatpage.content
-```
-
-### templates/1.mako
-
-```html
-<html>
-    <body>
-        <div class="header">
-            <%block name="header"/>
-        </div>
-
-        ${self.body()}
-
-        <div class="footer">
-            <%block name="footer">
-                this is the footer
-            </%block>
-        </div>
-    </body>
-</html>
-```
+### admin interface is available here: http://127.0.0.1:8000/admin/mako_flatpages/flatpage/
